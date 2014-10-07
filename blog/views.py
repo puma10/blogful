@@ -120,6 +120,18 @@ def delete_post(post_id):
         post_title = post_title
         )
 
+@app.route("/post/<int:post_id>/delete", methods = ["POST"])
+def delete_post_from_db(post_id):
+    post = session.query(Post).get(post_id + 1)
+
+    if request.form["action"] == "confirm":
+        session.delete(post)
+        flash("Your post has been deleted", "danger")
+        return redirect(url_for("posts"))
+    else:
+        flash("Your post has not been deleted", "danger")
+        return redirect(url_for("posts"))
+
 
 @app.route("/login", methods=["GET"])
 def login_get():
