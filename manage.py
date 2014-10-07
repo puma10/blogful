@@ -14,7 +14,22 @@ from blog.model import Post
 
 from blog.database import session
 
+from flask.ext.migrate import Migrate, MigrateCommand
+
+from blog.database import Base
+
 manager = Manager(app)
+
+
+
+class DB(object):
+    def __init__(self, metadata):
+        self.metadata = metadata
+
+migrate = Migrate(app, DB(Base.metadata))
+manager.add_command('db', MigrateCommand)
+
+
 
 @manager.command
 def run():

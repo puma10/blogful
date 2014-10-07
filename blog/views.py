@@ -12,6 +12,9 @@ from flask.ext.login import login_user
 from werkzeug.security import check_password_hash
 from model import User
 from flask.ext.login import login_required
+from flask.ext.login import current_user
+from flask.ext.login import logout_user
+
 
 #setup logging
 import logging
@@ -63,6 +66,7 @@ def add_post_post():
     post = Post(
         title=request.form["title"],
         content=mistune.markdown(request.form["content"]),
+        author=current_user
     )
     session.add(post)
     session.commit()
@@ -127,7 +131,12 @@ def login_post():
     return redirect(request.args.get('next') or url_for("posts"))
 
 
-
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("You have been logged out", "danger")
+    return redirect("/login")
 
 
 
