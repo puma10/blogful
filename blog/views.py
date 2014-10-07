@@ -86,32 +86,40 @@ def view_post(post_id):
 @app.route("/post/<int:post_id>/edit", methods = ["GET"])
 def edit_post(post_id):
     post = session.query(Post).get(post_id + 1)
+    post_user_id = post.author_id
     post_title = post.title
     post_content = post.content
-    return render_template("edit_post.html",
-        post_title = post_title,
-        post_content = post_content
-        )
+
+    if post_user_id == current_user.id:
+        return render_template("edit_post.html",
+            post_title = post_title,
+            post_content = post_content
+            )
+    else:
+        flash("You can only edit posts you have created", "danger")
+        return redirect(url_for("posts"))
+
 
 @app.route("/post/<int:post_id>/edit", methods = ["POST"])
 def save_edit_post(post_id):
-    post = Post(
-        title=request.form["title"],
-        content=mistune.markdown(request.form["content"]),
-    )
-    session.add(post)
+    post = session.query(Post).get(post_id + 1)
+    post.title = request.form["title"]
+    post.content = mistune.markdown(request.form["content"])
+
+    #session.add(post)
     session.commit()
     return redirect(url_for("posts"))
 
-#can't figure this out
-# @app.route("/post/<int:post_id>/delete", methods = ["POST"])
-# def delete_post(post_id):
-#     post = session.query(Post).get(post_id + 1)
-#     post_title = post.title
-#     return render_template("delete_post.html",
-#         post=post,
-#         post_title = post_title
-#         )
+
+@app.route("/post/<int:post_id>/delete", methods = ["GET"])
+def delete_post(post_id):
+    post = session.query(Post).get(post_id + 1)
+    post_title = post.title
+    return render_template("delete_post.html",
+        post=post,
+        post_title = post_title
+        )
+
 
 @app.route("/login", methods=["GET"])
 def login_get():
