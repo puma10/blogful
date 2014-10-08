@@ -127,6 +127,7 @@ def delete_post_from_db(post_id):
     if request.form["action"] == "confirm":
         session.delete(post)
         flash("Your post has been deleted", "danger")
+        session.commit()
         return redirect(url_for("posts"))
     else:
         flash("Your post has not been deleted", "danger")
